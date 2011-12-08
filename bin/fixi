@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'trollop'
+require 'fixi'
+
+name = ARGV.shift
+if name == "--help" || name == "-h" || name == "help"
+  name = ARGV.shift
+  if name.nil?
+    puts <<-EOS
+usage: fixi [--version] [--help] <command> [<options>] [path]
+
+All commands are scoped to the current directory or the given path, if specified.
+
+Commands:
+     add:   #{Fixi::Command::Add.synopsis}
+   check:   #{Fixi::Command::Check.synopsis}
+  commit:   #{Fixi::Command::Commit.synopsis}
+    info:   #{Fixi::Command::Info.synopsis}
+    init:   #{Fixi::Command::Init.synopsis}
+      ls:   #{Fixi::Command::Ls.synopsis}
+      rm:   #{Fixi::Command::Rm.synopsis}
+     sum:   #{Fixi::Command::Sum.synopsis}
+
+See 'fixi help <command>' for more information on a specific command.
+    EOS
+    exit 0
+  else
+    ARGV.insert(0, "--help")
+  end
+elsif name == "--version" || name == "-v"
+  puts "fixi version #{Fixi::VERSION}"
+  exit 0
+end
+
+command = Fixi::command name
+if command.nil?
+  puts "Error: No such command: #{name}"
+  exit 1
+end
+begin
+  command.execute ARGV
+rescue RuntimeError => msg
+  puts "Error: #{msg}"
+  exit 1
+#rescue => msg
+#  puts "Error: #{msg}"
+#  exit 1
+end
