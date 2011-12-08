@@ -23,4 +23,5 @@ Gem::Specification.new do |s|
   # s.add_runtime_dependency "rest-client"
 
   s.add_runtime_dependency "trollop"
+  s.add_runtime_dependency "sqlite3-ruby"
 end
