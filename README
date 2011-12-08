@@ -1,0 +1,19 @@
+Fixi - Source Code
+==================
+
+A fixity tracker utility.
+
+Installing From RubyGems.org
+----------------------------
+
+> [sudo] gem install fixi
+
+Installing From Source
+----------------------
+
+> [sudo] rake install
+
+Usage
+-----
+
+To see usage, after installing, run fixi --help
