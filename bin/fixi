@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'trollop'
 require 'fixi'
 
 name = ARGV.shift
