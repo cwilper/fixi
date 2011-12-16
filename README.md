@@ -13,6 +13,7 @@ and fixi aims to help with that in as unobtrusive a manner as possible.
 * Supports regular expression-based includes and excludes
 * Supports any combination of md5, sha1, sha256, sha384, and sha512
 * Supports shallow (fast) and deep (checksum-based) fixity checking
+* Support export and import of BagIt bags
 * Supports fast lookups of files by checksum
 
 # Installation
@@ -39,9 +40,6 @@ Similar steps may be necessary for other distros and operating systems.
 # General Usage
     fixi [--version] [--help] <command> [<options>] [<args>]
 
-Most commands accept a path to a directory or file as an argument.
-If unspecified, the current directory (".") is assumed.
-
 ## Global Options:
     --version, -v:   Display the version and exit.
        --help, -h:   Show general or command-specific help
@@ -57,6 +55,22 @@ See below for command-specific usage and options.
     --absolute, -a:   Show absolute paths. By default, paths are reported
                       relative to the index root.
      --dry-run, -d:   Don't do anything; just report what would be done
+
+# bag: Export files as a new BagIt bag
+
+## Usage:
+    fixi bag [<options>] <input-dir> <output-dir>
+
+## Where:
+    input-dir is an indexed directory whose content should be exported.
+    output-dir is the base directory of the bag to be created.
+
+## Options:
+    --algorithms, -l <s>:   Checksum algorithm(s) to use for the bag. This is a
+                            comma-separated list, which may include md5, sha1,
+                            sha256, sha384, sha512, and must be a subset of the
+                            indexed algorithms. If unspecified, manifests will be
+                            created for all indexed algorithms.
 
 # check: Verify the fixity of files in the index
 
@@ -141,4 +155,16 @@ See below for command-specific usage and options.
                             comma-separated list, which may include md5, sha1,
                             sha256, sha384, and sha512. At least one must be
                             specified.
- 
+
+# unbag: Import files from a BagIt bag
+
+## Usage:
+    fixi unbag [<options>] <input-dir> <output-dir>
+
+## Where:
+    input-dir is the base directory of the bag.
+    output-dir is the directory in which to import it.
+
+## Options:
+    --absolute, -a:   Show absolute paths. By default, paths are reported
+                      relative to the index root.
