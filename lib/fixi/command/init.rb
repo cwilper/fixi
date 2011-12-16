@@ -6,6 +6,10 @@ class Fixi::Command::Init
     "Create a new, empty index"
   end
 
+  def self.arghelp
+    "[path]"
+  end
+
   def self.details
     "This command is scoped to the current directory or the given path,
       if specified.".pack

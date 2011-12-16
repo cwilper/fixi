@@ -5,9 +5,12 @@ class Fixi::Command::Check
     "Verify the fixity of files in the index"
   end
 
+  def self.arghelp
+    "[<dir>|<file>]"
+  end
+
   def self.details
-    "This command is scoped to the current directory or the given path,
-      if specified.".pack
+    "If no argument is given, the current directory ('.') is assumed."
   end
 
   def execute args
@@ -15,6 +18,10 @@ class Fixi::Command::Check
       banner Fixi::Command.banner "check"
       opt :absolute, "Show absolute paths. By default, paths are reported
         relative to the index root.".pack
+      opt :algorithms, "Checksum algorithm(s) to use if shallow isn't specified.
+        This is a comma-separated list, which may include md5, sha1, sha256, sha384,
+        sha512, and must be a subset of the indexed algorithms. If unspecified,
+        defaults to all indexed algorithms.".pack, :short => 'l', :type => :string
       opt :shallow, "Do shallow comparisons when determining which files have
         changed. If specified, only file sizes and mtimes will be used. By 
         default, checksums will also be computed and compared if necessary.".pack
@@ -24,6 +31,12 @@ class Fixi::Command::Check
     path = File.expand_path(args[0] || ".")
     index = Fixi::Index.new(path)
    
+    # if algorithms specified, must be a subset of those indexed
+    opts[:algorithms] ||= index.algorithms
+    set = Set.new(index.algorithms.split(","))
+    subset = Set.new(opts[:algorithms].split(","))
+    raise "Specified algorithm(s) must be a subset of #{index.algorithms}" unless subset.subset?(set)
+
     index.each(args[0]) do |hash|
       relpath = hash['relpath']
       abspath = index.rootpath + '/' + relpath
@@ -38,9 +51,9 @@ class Fixi::Command::Check
             detail = opts[:verbose] ? "mtime=#{Time.at(mtime).utc.iso8601} " : ""
             puts "M #{detail}#{opts[:absolute] ? abspath : relpath}"
           elsif not opts[:shallow]
-            hexdigests = Fixi::hexdigests(Fixi::digests(index.algorithms), abspath)
+            hexdigests = Fixi::hexdigests(Fixi::digests(opts[:algorithms]), abspath)
             i = 0
-            index.algorithms.split(',').each do |algorithm|
+            opts[:algorithms].split(',').each do |algorithm|
               if hexdigests[i] != hash[algorithm]
                 detail = opts[:verbose] ? "#{algorithm}=#{hexdigests[i]} " : ""
                 puts "M #{detail}#{opts[:absolute] ? abspath : relpath}"

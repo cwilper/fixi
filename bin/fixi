@@ -3,17 +3,15 @@
 require 'rubygems'
 require 'fixi'
 
-name = ARGV.shift
-if name == "--help" || name == "-h" || name == "help"
-  name = ARGV.shift
-  if name.nil?
-    puts <<-EOS
+def show_usage_and_exit
+  puts <<-EOS
 usage: fixi [--version] [--help] <command> [<options>] [path]
 
 All commands are scoped to the current directory or the given path, if specified.
 
 Commands:
      add:   #{Fixi::Command::Add.synopsis}
+     bag:   #{Fixi::Command::Bag.synopsis}
    check:   #{Fixi::Command::Check.synopsis}
   commit:   #{Fixi::Command::Commit.synopsis}
     info:   #{Fixi::Command::Info.synopsis}
@@ -21,16 +19,26 @@ Commands:
       ls:   #{Fixi::Command::Ls.synopsis}
       rm:   #{Fixi::Command::Rm.synopsis}
      sum:   #{Fixi::Command::Sum.synopsis}
+   unbag:   #{Fixi::Command::Unbag.synopsis}
 
 See 'fixi help <command>' for more information on a specific command.
-    EOS
-    exit 0
+  EOS
+  exit 0
+end
+
+name = ARGV.shift
+if name == "--help" || name == "-h" || name == "help"
+  name = ARGV.shift
+  if name.nil?
+    show_usage_and_exit
   else
     ARGV.insert(0, "--help")
   end
 elsif name == "--version" || name == "-v"
   puts "fixi version #{Fixi::VERSION}"
   exit 0
+elsif name.nil?
+  show_usage_and_exit
 end
 
 command = Fixi::command name

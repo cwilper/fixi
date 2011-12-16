@@ -6,9 +6,12 @@ class Fixi::Command::Ls
     "List contents of the index"
   end
 
+  def self.arghelp
+    "[<dir>|<file>]"
+  end
+
   def self.details
-    "This command is scoped to the current directory or the given path,
-      if specified.".pack
+    "If no argument is given, the current directory ('.') is assumed."
   end
 
   def execute args

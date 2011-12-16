@@ -7,8 +7,12 @@ class Fixi::Command::Sum
     "Calculate checksum(s) of a file"
   end
 
+  def self.arghelp
+    "<file>"
+  end
+
   def self.details
-      "This command operates on files and does not require an index to exist."
+    "This command operates on files and does not require an index to exist."
   end
 
   def execute args

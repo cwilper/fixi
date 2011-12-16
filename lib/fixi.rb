@@ -39,4 +39,16 @@ module Fixi
     }
     hds
   end
+
+  def self.set_metadata(path, stat)
+    File.utime(stat.atime, stat.mtime, path)
+    begin
+      File.chown(stat.uid, stat.gid, path)
+    rescue Errno::EPERM
+      File.chmod(stat.mode & 01777, path)
+    else
+      File.chmod(stat.mode, path)
+    end
+  end
+
 end

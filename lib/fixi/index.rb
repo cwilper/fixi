@@ -1,7 +1,7 @@
 require 'sqlite3'
 
 class Fixi::Index
-  attr_reader :dotpath, :rootpath, :dbversion, :algorithms
+  attr_reader :dotpath, :rootpath, :dbversion, :algorithms, :includes, :excludes
 
   def initialize(startpath, create=false, algorithms=nil)
     startpath = File.expand_path(startpath || ".")
@@ -141,21 +141,27 @@ class Fixi::Index
     @db.execute(sql, relpath)
   end
 
-  def add(relpath)
+  def set_digest(relpath, alg, val)
+    sql = "update file set #{alg} = '#{val}' where relpath = ?"
+    @db.execute(sql, relpath)
+  end
+
+  def add(relpath, compute_checksums=true)
     abspath = File.join(@rootpath, relpath)
-    sql = "insert into file (relpath, size, mtime, "
-    sql += @algorithms
-    sql += ") values (:relpath, :size, :mtime, "
+    sql = "insert into file (relpath, size, mtime"
+    sql += ", " + @algorithms if compute_checksums
+    sql += ") values (:relpath, :size, :mtime"
     values = Hash.new
     values[:relpath] = relpath
     values[:size] = File.size abspath
     values[:mtime] = File.mtime(abspath).to_i
-    hexdigests = Fixi::hexdigests(Fixi::digests(@algorithms), abspath)
-    i = 0
-    @algorithms.split(",").each do |alg|
-      sql += ", " if i > 0
-      sql += "'" + hexdigests[i] + "'"
-      i += 1
+    if compute_checksums
+      hexdigests = Fixi::hexdigests(Fixi::digests(@algorithms), abspath)
+      i = 0
+      @algorithms.split(",").each do |alg|
+        sql += ", '" + hexdigests[i] + "'"
+        i += 1
+      end
     end
     sql += ")"
     @db.execute(sql, values)
@@ -171,6 +177,13 @@ class Fixi::Index
     puts "Fixi database version #{dbversion}"
   end
 
+  def matches_any?(path, patterns)
+    patterns.each do |pattern|
+      return true if pattern.match(path)
+    end
+    return false
+  end
+
   private
 
   def load_patterns(name)
@@ -183,13 +196,6 @@ class Fixi::Index
       end
     end
     result
-  end
-
-  def matches_any?(path, patterns)
-    patterns.each do |pattern|
-      return true if pattern.match(path)
-    end
-    return false
   end
 
   # Return the first .fixi directory we find while traversing up the tree
