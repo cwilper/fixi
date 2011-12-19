@@ -18,6 +18,8 @@ and fixi aims to help with that in as unobtrusive a manner as possible.
 
 # Installation
 
+Note: Fixi has been tested with Ruby 1.9 on Mac OS X, Ubuntu, and Windows.
+
 Releases of Fixi are published to rubygems.org, so you can install them the
 usual way:
 
@@ -27,7 +29,10 @@ Or you can install from source via:
 
     > [sudo] rake install
 
-*NOTE: Fixi uses sqlite3, which will need to be built if it's not already on
+*NOTE: Fixi should generally work in any environment where Ruby 1.9 has been
+installed. It has been tested on OS X, Ubuntu, and Windows.*
+
+*NOTE: Fixi uses sqlite3, which may need to be built if it's not already on
 your system.*
 
 If you are using Ubuntu and you get an error about building sqlite, you may
@@ -67,11 +72,12 @@ The check command reports on each file that has been added (A), modified (M),
 or deleted (D).  After verifying that the reported adds and deletes are expected,
 you can update the index via:
 
-    > fixi add && fixi rm
+    > fixi add
+    > fixi rm
 
 Now let's say a couple more weeks have passed, and you've intentionally changed
-the EXIF metadata in a bunch of old photos. You do another shallow check, verify
-the reported modifications are expected, and update the index via:
+the EXIF metadata in a bunch of old photos. After doing another shallow check and
+verifying the reported modifications are expected, you can update the index via:
 
     > fixi commit
 
