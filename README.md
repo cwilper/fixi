@@ -18,7 +18,8 @@ and fixi aims to help with that in as unobtrusive a manner as possible.
 
 # Installation
 
-Note: Fixi has been tested with Ruby 1.9 on Mac OS X, Ubuntu, and Windows.
+*NOTE: Fixi has been tested with Ruby 1.9 on recent versions of Mac OS X, Ubuntu,
+and Windows.*
 
 Releases of Fixi are published to rubygems.org, so you can install them the
 usual way:
@@ -28,9 +29,6 @@ usual way:
 Or you can install from source via:
 
     > [sudo] rake install
-
-*NOTE: Fixi should generally work in any environment where Ruby 1.9 has been
-installed. It has been tested on OS X, Ubuntu, and Windows.*
 
 *NOTE: Fixi uses sqlite3, which may need to be built if it's not already on
 your system.*
