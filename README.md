@@ -13,7 +13,7 @@ and fixi aims to help with that in as unobtrusive a manner as possible.
 * Supports regular expression-based includes and excludes
 * Supports any combination of md5, sha1, sha256, sha384, and sha512
 * Supports shallow (fast) and deep (checksum-based) fixity checking
-* Support export and import of BagIt bags
+* Supports export and import of BagIt bags
 * Supports fast lookups of files by checksum
 
 # Installation
@@ -21,11 +21,11 @@ and fixi aims to help with that in as unobtrusive a manner as possible.
 Releases of Fixi are published to rubygems.org, so you can install them the
 usual way:
 
-    [sudo] gem install fixi
+    > [sudo] gem install fixi
 
 Or you can install from source via:
 
-    [sudo] rake install
+    > [sudo] rake install
 
 *NOTE: Fixi uses sqlite3, which will need to be built if it's not already on
 your system.*
@@ -33,9 +33,57 @@ your system.*
 If you are using Ubuntu and you get an error about building sqlite, you may
 need to install both the ruby1.9.1-dev and the libsqlite3-dev packages:
 
-    [sudo] apt-get install ruby1.9.1-dev libsqlite3-dev
+    > [sudo] apt-get install ruby1.9.1-dev libsqlite3-dev
 
 Similar steps may be necessary for other distros and operating systems.
+
+# Quick Example
+
+Say you have a growing collection of photos you keep organized on your laptop.
+You keep a backup in the cloud, but you also want to start tracking the 
+bit-level integrity of the files. You're particularly concerned that files on
+your laptop may become corrupt over time, and if you don't notice soon enough,
+ the problem might eventually be propogated to your backup copy!
+
+First, create a fixity index. Let's say you decide you want to keep md5 and
+sha1 checksums of each file rather than using the default single hash algorithm,
+sha256.
+
+    > cd ~/Pictures
+    > fixi init -l md5,sha1
+
+Now you have an empty index. To populate it for the first time:
+
+    > fixi add
+
+Let's say after a couple weeks, you have more pictures. You've also intentionally
+deleted a few older pictures you don't care about anymore. To get a quick report
+of what has changed, without having to actually compute any checksums (the -s
+option is short for --shallow), you can run:
+
+    > fixi check -s
+
+The check command reports on each file that has been added (A), modified (M),
+or deleted (D).  After verifying that the reported adds and deletes are expected,
+you can update the index via:
+
+    > fixi add && fixi rm
+
+Now let's say a couple more weeks have passed, and you've intentionally changed
+the EXIF metadata in a bunch of old photos. You do another shallow check, verify
+the reported modifications are expected, and update the index via:
+
+    > fixi commit
+
+Note: Anytime you want to do a full fixity check of all files, or even just a 
+single file, you can run:
+
+    > fixi check [/path/to/indexed/dir-or-file]
+
+These are just the basics. For more information about all the commands fixi
+supports, run:
+
+    > fixi --help
 
 # General Usage
     fixi [--version] [--help] <command> [<options>] [<args>]
