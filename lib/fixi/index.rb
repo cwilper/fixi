@@ -82,9 +82,9 @@ class Fixi::Index
     if path && File.expand_path(path) != @rootpath
       relpath = relpath(File.expand_path(path))
       if File.directory?(path)
-        conditions << " relpath like '#{relpath}/%'"
+        conditions << " relpath like ?"
       else
-        conditions << " relpath = '#{relpath}'"
+        conditions << " relpath = ?"
       end
     end
     attribs.each do |name,value|
@@ -103,8 +103,20 @@ class Fixi::Index
         sql += " #{c}"
       end
     end
-    @db.execute(sql) do |hash|
-      yield hash
+    if (!relpath.nil?) 
+      if File.directory?(path)
+        @db.execute(sql, relpath+"/%") do |hash|
+          yield hash
+        end
+      else
+        @db.execute(sql, relpath) do |hash|
+          yield hash
+        end
+      end
+    else
+      @db.execute(sql) do |hash|
+        yield hash
+      end
     end
   end
 
