@@ -3,13 +3,10 @@ require 'sqlite3'
 class Fixi::Index
   attr_reader :dotpath, :rootpath, :dbversion, :algorithms, :includes, :excludes
 
-  def initialize(startpath, create=false, algorithms=nil)
+  def initialize(startpath, create=false, algorithms=nil, fs_path_must_exist=true)
     startpath = File.expand_path(startpath || ".")
-    unless File.directory?(startpath)
-      raise "No such file or directory: #{startpath}" unless File.exist?(startpath)
-      startpath = File.dirname(startpath)
-    end
     if create
+      raise Errno::ENOTDIR, "'#{startpath}'" unless File.directory?(startpath)
       Fixi::digests(algorithms)
       @dotpath = File.join(startpath, ".fixi")
       raise "Index already exists at #{@dotpath}" if Dir.exist? @dotpath
@@ -39,6 +36,10 @@ class Fixi::Index
       open(File.join(@dotpath, "includes"), "w") { |f| f.puts ".*" }
       open(File.join(@dotpath, "excludes"), "w") { |f| f.puts "^\\.fixi\\/" }
     else
+      raise Errno::ENOENT, "'#{startpath}'" if fs_path_must_exist and !File.exist?(startpath)
+      unless File.directory?(startpath)
+        startpath = File.dirname(startpath)
+      end
       @dotpath = find_dotpath(startpath)
       @db = SQLite3::Database.new(File.join(@dotpath, "fixi.db"))
       @db.execute("select dbversion, algorithms from fixi") do |row|
