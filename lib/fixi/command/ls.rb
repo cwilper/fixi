@@ -33,7 +33,7 @@ class Fixi::Command::Ls
       opt :verbose, "Include all information known about each file. By default,
         only paths will be listed.".pack
     end
-    index = Fixi::Index.new(args[0])
+    index = Fixi::Index.new(args[0], false, nil, false)
     if opts[:json]
       print "["
     end

@@ -23,7 +23,7 @@ class Fixi::Command::Rm
       opt :dry_run, "Don't do anything; just report what would be done"
     end
     path = File.expand_path(args[0] || ".")
-    index = Fixi::Index.new(path)
+    index = Fixi::Index.new(path, false, nil, false)
 
     index.each(args[0]) do |hash|
       relpath = hash['relpath']
